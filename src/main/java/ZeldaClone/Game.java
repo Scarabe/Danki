@@ -2,6 +2,7 @@ package ZeldaClone;
 
 import ZeldaClone.entity.Entity;
 import ZeldaClone.entity.Player;
+import ZeldaClone.world.World;
 import graficos.Spritesheet;
 
 import javax.swing.*;
@@ -16,17 +17,19 @@ import java.util.Objects;
 
 public class Game extends Canvas implements Runnable, KeyListener {
     public static JFrame jframe;
-    private final int WIDTH = 240;
+    private final int WIDTH = 160;
     private final int HEIGHT = 160;
-    private final int SCALE = 3;
-    private BufferedImage image;
+    private final int SCALE = 2;
+    private final BufferedImage image;
+
+    public static World world;
 
     private Player player;
     private boolean isRunning;
     private Thread thread;
 
     public List<Entity> entities;
-    public Spritesheet spritesheet;
+    public static Spritesheet spritesheet;
 
     public Game(){
         addKeyListener(this);
@@ -34,10 +37,12 @@ public class Game extends Canvas implements Runnable, KeyListener {
         this.setPreferredSize(new Dimension(WIDTH*SCALE, HEIGHT*SCALE));
         jframe = new JFrame("Meu jogo");
         initFrame();
-        image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 
+        image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         entities = new ArrayList<>();
         spritesheet = new Spritesheet("/spritesheetZelda.png");
+        world = new World("/firstMapZelda.png");
+
         player = new Player(0,0,16,16, spritesheet.getSprite(32, 0, 16,16));
         entities.add(player);
     }
@@ -74,7 +79,6 @@ public class Game extends Canvas implements Runnable, KeyListener {
         BufferStrategy bs = this.getBufferStrategy();
         if(Objects.isNull(bs)){
             this.createBufferStrategy(3);
-
         }else{
             Graphics g = image.getGraphics();
 
@@ -85,6 +89,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
             g = bs.getDrawGraphics();
             g.drawImage(image, 0, 0, WIDTH*SCALE, HEIGHT*SCALE, null);
 
+            world.render(g);
             for (Entity e : entities) {
                 e.render(g);
             }
